@@ -48,9 +48,10 @@ def create_repo(repo_name, comment="", default_distribution="", default_componen
         if "409" in str(error):
             print(f"Unable to create repository {repo_name}, most likely already exist!")
     
-def upload_single_file_to_aptly(repo_name, filepath):
+def upload_single_file_to_aptly_upload_dir(repo_name, filepath):
     try:
         file = {'file': open(filepath, 'rb')}
+        #Add validation that upload file is actually deb file
         response = requests.post('{}{}{}'.format(APTLY_URL, routes["file"], repo_name), auth=(API_USER, API_PASS), files=file)
         response.raise_for_status()
         print(response.text)
@@ -59,3 +60,20 @@ def upload_single_file_to_aptly(repo_name, filepath):
     
     except requests.exceptions.HTTPError as error:
         print(error)
+
+def upload_entire_deb_folder_to_upload_dir(repo_name, local_deb_dir):
+    try:
+        list_of_debs_to_upload = [os.path.join(local_deb_dir, file) for file in os.listdir(local_deb_dir)]
+        for deb_file in list_of_debs_to_upload:
+            #Add validation that upload file is actually deb file, only omit files that aren't deb file
+            file_to_upload = {'file': open(deb_file, 'rb')}
+            response = requests.post('{}{}{}'.format(APTLY_URL, routes["file"], repo_name), auth=(API_USER, API_PASS), files=file_to_upload)
+            response.raise_for_status()
+            print(response.text)
+    except FileNotFoundError as nofile_error :
+        print(nofile_error)
+    
+    except requests.exceptions.HTTPError as error:
+        print(error)
+        
+# test = upload_deb_folder_to_aptly_upload_dir('someotherrepo', '/mnt/c/Users/tomer/work/plp/')

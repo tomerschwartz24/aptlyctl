@@ -1,6 +1,6 @@
 import typer
 from rich import print
-from cli import list_repos, show_repo, create_repo, upload_single_file_to_aptly
+from cli import list_repos, show_repo, create_repo, upload_single_file_to_aptly_upload_dir, upload_entire_deb_folder_to_upload_dir
 
 app = typer.Typer(name="aptlyctl")
 
@@ -34,13 +34,22 @@ def repo_create(repo_name: str,
     print(creation_attempt)
 
 @app.command()
-def upload_single_file(repo_name: str = typer.Argument(help="repository name to upload to (upload/repo_name/file will be created on the server)"), 
+def single_to_upload_dir(repo_name: str = typer.Argument(help="repository name to upload to (upload/repo_name/file will be created on the server)"), 
                        filepath: str = typer.Argument(help="Full Path to file you want to upload")
                 ):
     """
-    Upload a deb file to aptly server (upload dir)
+    Upload a single deb file to aptly server (upload dir)
     """
-    upload_single_file_to_aptly(repo_name, filepath)
+    upload_single_file_to_aptly_upload_dir(repo_name, filepath)
+    
+@app.command()
+def entire_dir_to_upload_dir(repo_name: str = typer.Argument(help="repository name to upload to (upload/repo_name/ will be created on the server)"), 
+                       local_deb_dir: str = typer.Argument(help="Full Path to the local deb files dir you want to upload [e.g : /mnt/c/Users/tomer/work/debs/]")
+                ):
+    """
+    Upload entire deb files directory to aptly server (upload dir)
+    """
+    upload_entire_deb_folder_to_upload_dir(repo_name, local_deb_dir)
 
 @app.callback()
 def show_help(ctx: typer.Context):
