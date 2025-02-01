@@ -23,7 +23,7 @@ def repo_show(repo_name: str):
 @app.command()
 def repo_create(repo_name: str, comment: str = "", default_distribution: str = "", default_component: str = "", from_snapshot: str = ""):
     """
-    create a repository, Required parameters : repo_name , Optional parameters: [comment, default_distribution, default_component, from_snapshot]
+    create a repository on remote aptly server
     """
     creation_attempt = create_repo(repo_name, comment, default_distribution, default_component, from_snapshot)
     print(creation_attempt)
