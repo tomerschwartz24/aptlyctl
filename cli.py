@@ -10,7 +10,7 @@ API_PASS = os.environ.get('API_PASS')
 GPG_PASSPHRASE = os.environ.get('GPG_PASSPHRASE')
 
 
-def repo_list():
+def list_repos():
     try:
         response = requests.get('{}{}'.format(APTLY_URL, routes["repo"]), auth=(API_USER, API_PASS))
         response.raise_for_status()
@@ -21,7 +21,7 @@ def repo_list():
     except requests.exceptions.HTTPError as error:
         return error
 
-def repo_show(repo_name):
+def show_repo(repo_name):
     try:
         response = requests.get('{}{}{}'.format(APTLY_URL, routes["repo"], repo_name), auth=(API_USER, API_PASS))
         response.raise_for_status()
@@ -30,7 +30,7 @@ def repo_show(repo_name):
     except requests.exceptions.HTTPError as error:
         return error
 
-def repo_create(repo_name, comment="", default_distribution="", default_component="", from_snapshot=""):               
+def create_repo(repo_name, comment="", default_distribution="", default_component="", from_snapshot=""):               
     repo_creation_data = {"Name": repo_name, 
                           "Comment": comment, 
                           "DefaultDistribution": default_distribution,
@@ -49,4 +49,3 @@ def repo_create(repo_name, comment="", default_distribution="", default_componen
             print(f"Unable to create repository {repo_name}, most likely already exist!")
         return error
     
-all_repos = repo_list()
