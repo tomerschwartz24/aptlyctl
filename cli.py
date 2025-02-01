@@ -2,12 +2,24 @@ from aptly_api import routes
 from config import APTLY_URL
 
 import requests
+import json
 import os 
 
 API_USER = os.environ.get('API_USER')
 API_PASS = os.environ.get('API_PASS')
 GPG_PASSPHRASE = os.environ.get('GPG_PASSPHRASE')
 
+
+def repo_list():
+    try:
+        response = requests.get('{}{}'.format(APTLY_URL, routes["repo"]), auth=(API_USER, API_PASS))
+        response.raise_for_status()
+        repo_list_of_dicts = response.json()
+        for repo in repo_list_of_dicts:
+            print(json.dumps(repo, indent=4))
+
+    except requests.exceptions.HTTPError as error:
+        return error
 
 def repo_show(repo_name):
     try:
@@ -37,4 +49,4 @@ def repo_create(repo_name, comment="", default_distribution="", default_componen
             print(f"Unable to create repository {repo_name}, most likely already exist!")
         return error
     
-
+all_repos = repo_list()
