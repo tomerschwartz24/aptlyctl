@@ -47,5 +47,15 @@ def create_repo(repo_name, comment="", default_distribution="", default_componen
     except requests.exceptions.HTTPError as error:
         if "409" in str(error):
             print(f"Unable to create repository {repo_name}, most likely already exist!")
-        return error
     
+def upload_single_file_to_aptly(repo_name, filepath):
+    try:
+        file = {'file': open(filepath, 'rb')}
+        response = requests.post('{}{}{}'.format(APTLY_URL, routes["file"], repo_name), auth=(API_USER, API_PASS), files=file)
+        response.raise_for_status()
+        print(response.text)
+    except FileNotFoundError as nofile_error :
+        print(nofile_error)
+    
+    except requests.exceptions.HTTPError as error:
+        print(error)
