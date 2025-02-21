@@ -35,13 +35,18 @@ def repo_create(repo_name: str,
 
 
 @app.command()
-def repo_delete(repo_name: str):
+def repo_delete(repo_name: str,
+                 force: bool = typer.Option(False, "--force", help="Force delete the repository if it has snapshots.")
+                ):
     """
-    delete a local repository
+    delete a local repository (if repository is published it cannot be deleted, if repository has snapshot deletion must be forced.)
     """
-    repo_data = delete_repo(repo_name)
-    print(repo_data) 
-
+    if force:
+        force=1
+    else:
+        force=0
+    deletion_attempt = delete_repo(repo_name, force=force)
+    print(deletion_attempt)
 @app.command()
 def single_to_upload_dir(repo_name: str = typer.Argument(help="repository name to upload to (upload/repo_name/file will be created on the server)"), 
                        filepath: str = typer.Argument(help="Full Path to file you want to upload")
