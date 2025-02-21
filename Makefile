@@ -1,5 +1,7 @@
 
 
+all: clean build pathly
+
 pathly:
 	sudo cp dist/aptlyctl /usr/bin/
 

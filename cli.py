@@ -29,7 +29,7 @@ def show_repo(repo_name):
     except requests.exceptions.HTTPError as error:
         return error
 
-def create_repo(repo_name, comment="", default_distribution="", default_component="", from_snapshot=""):               
+def create_repo(repo_name, comment="", default_distribution="", default_component="", from_snapshot=""):
     repo_creation_data = {"Name": repo_name, 
                           "Comment": comment, 
                           "DefaultDistribution": default_distribution,
@@ -47,18 +47,18 @@ def create_repo(repo_name, comment="", default_distribution="", default_componen
         if "409" in str(error):
             print(f"Unable to create repository {repo_name}, most likely already exist!")
 
-
-def delete_repo(repo_name):
+def delete_repo(repo_name, force):
     #Fix deleting repositories with symbols (not working) (such as @@@#)
+
     try:
-        response = requests.delete("{}{}{}".format(APTLY_URL, routes["repo"], repo_name), auth=(API_USER, API_PASS))
+        
+        response = requests.delete("{}{}{}?force={}".format(APTLY_URL, routes["repo"], repo_name, force), auth=(API_USER, API_PASS))
         response.raise_for_status()
-        return response.text
+        return f"{repo_name} repository has been deleted!"
         
     except requests.exceptions.HTTPError as error:
-        return error
+        return f"{error} \n {response.content}"
 
-    
 def upload_single_file_to_aptly_upload_dir(repo_name, filepath):
     try:
         file = {'file': open(filepath, 'rb')}
@@ -86,3 +86,4 @@ def upload_entire_deb_folder_to_upload_dir(repo_name, local_deb_dir):
     
     except requests.exceptions.HTTPError as error:
         print(error)
+
