@@ -1,6 +1,6 @@
 import typer
 from rich import print
-from cli import list_repos, show_repo, create_repo, upload_single_file_to_aptly_upload_dir, upload_entire_deb_folder_to_upload_dir
+from cli import list_repos, show_repo, create_repo, delete_repo ,upload_single_file_to_aptly_upload_dir, upload_entire_deb_folder_to_upload_dir
 
 app = typer.Typer(name="aptlyctl")
 
@@ -32,6 +32,15 @@ def repo_create(repo_name: str,
     """
     creation_attempt = create_repo(repo_name, comment, default_distribution, default_component, from_snapshot)
     print(creation_attempt)
+
+
+@app.command()
+def repo_delete(repo_name: str):
+    """
+    delete a local repository
+    """
+    repo_data = delete_repo(repo_name)
+    print(repo_data) 
 
 @app.command()
 def single_to_upload_dir(repo_name: str = typer.Argument(help="repository name to upload to (upload/repo_name/file will be created on the server)"), 

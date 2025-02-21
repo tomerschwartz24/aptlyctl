@@ -9,7 +9,6 @@ API_USER = os.environ.get('API_USER')
 API_PASS = os.environ.get('API_PASS')
 GPG_PASSPHRASE = os.environ.get('GPG_PASSPHRASE')
 
-
 def list_repos():
     try:
         response = requests.get('{}{}'.format(APTLY_URL, routes["repo"]), auth=(API_USER, API_PASS))
@@ -47,6 +46,18 @@ def create_repo(repo_name, comment="", default_distribution="", default_componen
     except requests.exceptions.HTTPError as error:
         if "409" in str(error):
             print(f"Unable to create repository {repo_name}, most likely already exist!")
+
+
+def delete_repo(repo_name):
+    #Fix deleting repositories with symbols (not working) (such as @@@#)
+    try:
+        response = requests.delete("{}{}{}".format(APTLY_URL, routes["repo"], repo_name), auth=(API_USER, API_PASS))
+        response.raise_for_status()
+        return response.text
+        
+    except requests.exceptions.HTTPError as error:
+        return error
+
     
 def upload_single_file_to_aptly_upload_dir(repo_name, filepath):
     try:
@@ -75,5 +86,3 @@ def upload_entire_deb_folder_to_upload_dir(repo_name, local_deb_dir):
     
     except requests.exceptions.HTTPError as error:
         print(error)
-        
-# test = upload_deb_folder_to_aptly_upload_dir('someotherrepo', '/mnt/c/Users/tomer/work/plp/')
