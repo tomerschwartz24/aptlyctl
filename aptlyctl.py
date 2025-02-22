@@ -1,6 +1,6 @@
 import typer
 from rich import print
-from cli import list_repos, show_repo, create_repo, delete_repo ,upload_single_file_to_aptly_upload_dir, upload_entire_deb_folder_to_upload_dir
+from cli import list_repos, show_repo, show_repo_packages, create_repo, delete_repo ,upload_single_file_to_aptly_upload_dir, upload_entire_deb_folder_to_upload_dir
 
 app = typer.Typer(name="aptlyctl")
 
@@ -20,6 +20,22 @@ def repo_show(repo_name: str):
     repo_data = show_repo(repo_name)
     print(repo_data) 
 
+
+@app.command()
+def repo_packages_show(
+                repo_name: str,
+                package_name: str = typer.Option("", help="package name to query for") ,
+                details: bool = typer.Option(False, "--details", help="Get verbose details about all packages or a single package"),
+                with_deps: bool = typer.Option(False , "--with-deps",help="describe package dependencies (only relevant when querying a specific package)")
+                ):
+    """
+    get package/s details, get package/s extended details, get package with its dependencies and extended details.
+    """
+
+    show_repo_packages(repo_name, package_name, details, with_deps)
+
+
+
 @app.command()
 def repo_create(repo_name: str,
                 comment: str = typer.Option("", help="text describing local repository, for the user"),
@@ -33,7 +49,7 @@ def repo_create(repo_name: str,
     creation_attempt = create_repo(repo_name, comment, default_distribution, default_component, from_snapshot)
     print(creation_attempt)
 
-
+#describing package dependencies is only relevant when querying a specific package
 @app.command()
 def repo_delete(repo_name: str,
                  force: bool = typer.Option(False, "--force", help="Force delete the repository if it has snapshots.")

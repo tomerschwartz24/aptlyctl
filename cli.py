@@ -29,6 +29,29 @@ def show_repo(repo_name):
     except requests.exceptions.HTTPError as error:
         return error
 
+def show_repo_packages(repo_name, package_name="", details=False, with_deps=False):
+    query_specific_pkg = f"?q={package_name}"
+    if details:
+        format_pkg_details = "format=details"
+    else:
+        format_pkg_details = ""
+    
+    if with_deps:
+        describe_pkg_deps = "withDeps=1"
+    else:
+        describe_pkg_deps = "withDeps=0"
+        
+    try:
+        response = requests.get('{}{}{}/packages{}&{}&{}'.format(APTLY_URL, routes["repo"], repo_name, query_specific_pkg, format_pkg_details, describe_pkg_deps), auth=(API_USER, API_PASS))
+        response.raise_for_status()
+        repo_packages = response.json()
+        for pkg in repo_packages:
+            print(json.dumps(pkg, indent=4))
+            
+
+    except requests.exceptions.HTTPError as error:
+        return error
+    
 def create_repo(repo_name, comment="", default_distribution="", default_component="", from_snapshot=""):
     repo_creation_data = {"Name": repo_name, 
                           "Comment": comment, 
@@ -86,4 +109,3 @@ def upload_entire_deb_folder_to_upload_dir(repo_name, local_deb_dir):
     
     except requests.exceptions.HTTPError as error:
         print(error)
-
